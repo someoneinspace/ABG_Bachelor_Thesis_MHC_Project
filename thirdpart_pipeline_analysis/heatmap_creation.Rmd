@@ -1,0 +1,52 @@
+---
+title: "heatmap_creation"
+author: "Faik Usul"
+date: "2023-06-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/Faik/ABG_thesis/variant_data/last_data/all_MHCII/")
+```
+
+This Rmd file is used to create and write the pdf of the heatmap of breeds on the frequency of alternative SNPs. The pdf is written in a folder "new_MDS_PCA".
+
+
+```{r}
+# Frequency file is read into a dataframe.
+freq_MHCII_all <- read.table("freq_MHCII_allbreed.frq.strat", header = TRUE)
+```
+
+
+```{r}
+# A dataframe of frequency values of SNPs per breed is created by traversing the frequency file of plink.
+breed_names <- c("Afrikaner", "Ankole", "BAR", "Bonsmara", "Deep_red", "Dutch_belted", "Eastern_Finn_cattle",
+                 "Egyptian", "Fries_Hollands", "Groninger_Whiteheaded", "Karamojong", "MER", "MIR", "MRY",
+                 "Nganda", "Nguni", "Nkedi", "Northern_Finn_cattle", "Ntuku", "Tuli", "Western_Finn_cattle",
+                 "Finn_Holstein_Friesian","Holstein-Fresian","Holstein-Friesian", "Holstein", "Friesian")
+# nrow number should be arranged manually according to the number of SNPs.
+all_mhc2_freq <- data.frame(matrix(ncol = 26, nrow = 8503))
+colnames(all_mhc2_freq) <- breed_names
+for( i in 1:26){
+  all_mhc2_freq[,breed_names[i]] <- freq_MHCII_all[freq_MHCII_all$CLST == breed_names[i], "MAF"]
+}
+
+colnames(all_mhc2_freq) <- c("Afrikaner", "Ankole", "BAR", "Bonsmara", "Deep_red", "Dutch_belted", "Eastern_Finn_cattle",
+                 "Egyptian", "Fries_Hollands", "Groninger_Whiteheaded", "Karamojong", "MER", "MIR", "MRY",
+                 "Nganda", "Nguni", "Nkedi", "Northern_Finn_cattle", "Ntuku", "Tuli", "Western_Finn_cattle",
+                 "Finn_Holstein_Friesian","EG_Holstein_Friesian","NL_Holstein_Friesian", "SA_Holstein_Friesian", "UG_Holstein_Friesian")
+
+SNP_loc_info_mhc2 <- substr(unique(freq_MHCII_all$SNP), 3, 100)
+SNP_loc_info_mhc2 <- as.numeric(SNP_loc_info_mhc2)
+```
+
+
+```{r}
+# Heatmap is created by clustering the rows of breeds to be written as pdf.
+pheatmap(t(all_mhc2_freq), cluster_rows = TRUE, cluster_cols = FALSE, width = 20, height = 10,
+         treeheight_row = 70, main = "Heatmap with MHCII Alternative SNPs Frequencies", filename = "./new_MDS_PCA/heatmap_freq_MHCII_per_breed.pdf")
+# Heatmap is created by clustering the rows of breeds and the columns of SNPs to be written as pdf.
+pheatmap(t(all_mhc2_freq), cluster_rows = TRUE, cluster_cols = TRUE, width = 20, height = 10, treeheight_col = 0,
+         treeheight_row = 70, main = "Heatmap with MHCII Alternative SNPs Frequencies", filename = "./new_MDS_PCA/heatmap_freq_MHCII_per_breed_cls_col.pdf")
+```

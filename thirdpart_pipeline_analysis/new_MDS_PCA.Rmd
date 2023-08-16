@@ -1,0 +1,181 @@
+---
+title: "new_MDS_and_PCA"
+author: "Faik Usul"
+date: "2023-06-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "C:/Users/Faik/ABG_thesis/variant_data/last_data/all_MHCII/")
+```
+
+This "Rmd" file is used in Rstudio per MHCI and MHCII to write pdf files of MDS and PCA plots in a folder named "new_MDS_PCA".
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+# mds file is read into a dataframe
+mds_mhc2 <- read.table("AF_EU_MHCII_ge_mi_mds.mds", header = TRUE)
+```
+
+```{r}
+# the names for HF breeds are arranged more clearly
+mds_mhc2[mds_mhc2$FID == "Holstein-Fresian","FID"] <- "EG_Holstein_Friesian"
+mds_mhc2[mds_mhc2$FID == "Holstein-Friesian","FID"] <- "NL_Holstein_Friesian"
+mds_mhc2[mds_mhc2$FID == "Holstein","FID"] <- "SA_Holstein_Friesian"
+mds_mhc2[mds_mhc2$FID == "Friesian","FID"] <- "UG_Holstein_Friesian"
+```
+
+
+```{r}
+# country names corresponding to the breed names are added as a column in a dataframe
+mds_mhc2$Country <- "some"
+mds_mhc2[mds_mhc2$FID == "Egyptian","Country"] <- "Egypt"
+mds_mhc2[mds_mhc2$FID == "EG_Holstein_Friesian","Country"] <- "Egypt"
+mds_mhc2[mds_mhc2$FID == "Eastern_Finn_cattle","Country"] <- "Finland"
+mds_mhc2[mds_mhc2$FID == "Western_Finn_cattle","Country"] <- "Finland"
+mds_mhc2[mds_mhc2$FID == "Northern_Finn_cattle","Country"] <- "Finland"
+mds_mhc2[mds_mhc2$FID == "Finn_Holstein_Friesian","Country"] <- "Finland"
+mds_mhc2[mds_mhc2$FID == "Dutch_belted","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "Fries_Hollands","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "Groninger_Whiteheaded","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "Deep_red","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "MRY","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "NL_Holstein_Friesian","Country"] <- "Netherlands"
+mds_mhc2[mds_mhc2$FID == "BAR","Country"] <- "Portugal"
+mds_mhc2[mds_mhc2$FID == "MER","Country"] <- "Portugal"
+mds_mhc2[mds_mhc2$FID == "MIR","Country"] <- "Portugal"
+mds_mhc2[mds_mhc2$FID == "Afrikaner","Country"] <- "S_Africa"
+mds_mhc2[mds_mhc2$FID == "Bonsmara","Country"] <- "S_Africa"
+mds_mhc2[mds_mhc2$FID == "Nguni","Country"] <- "S_Africa"
+mds_mhc2[mds_mhc2$FID == "Tuli","Country"] <- "S_Africa"
+mds_mhc2[mds_mhc2$FID == "SA_Holstein_Friesian","Country"] <- "S_Africa"
+mds_mhc2[mds_mhc2$FID == "Ankole","Country"] <- "Uganda"
+mds_mhc2[mds_mhc2$FID == "Karamojong","Country"] <- "Uganda"
+mds_mhc2[mds_mhc2$FID == "Nganda","Country"] <- "Uganda"
+mds_mhc2[mds_mhc2$FID == "Nkedi","Country"] <- "Uganda"
+mds_mhc2[mds_mhc2$FID == "Ntuku","Country"] <- "Uganda"
+mds_mhc2[mds_mhc2$FID == "UG_Holstein_Friesian","Country"] <- "Uganda"
+
+# some color codes are found and stored to be used in the plots.
+c26 <- c(
+  "dodgerblue2", "#E31A1C", # red
+  "green4",
+  "#6A3D9A", # purple
+  "#FF7F00", # orange
+  "black", "gold1",
+  "skyblue2", "#FB9A99", # lt pink
+  "palegreen2",
+  "#CAB2D6", # lt purple
+  "#FDBF6F", # lt orange
+  "gray70", "khaki2",
+  "maroon", "orchid1", "deeppink1", "blue1", "steelblue4",
+  "darkturquoise", "green1", "yellow4", "yellow3",
+  "darkorange4", "brown", "#FF3300"
+)
+
+```
+
+
+```{r}
+# first, the MDS plot for all breeds is created
+pdf("./new_MDS_PCA/mhc2_MDS_all_breed.pdf", width = 15, height = 10)
+ggplot(mds_mhc2, aes(C1, C2)) + geom_point(aes(color = FID, shape = Country, size = 1)) + scale_shape_manual(values = c(8, 11, 15, 16, 17, 18)) +scale_color_manual(values = c26) + labs(title = "                                                                       MDS Plot with MHCII SNPs for All Breeds")
+dev.off()
+```
+
+```{r}
+# then, plots including all cattle highlighted by thier countries is created
+pdf("./new_MDS_PCA/mhc2_MDS_all_country.pdf", width = 15, height = 10)
+ggplot(mds_mhc2, aes(C1, C2)) + geom_point(aes(color = Country, shape = Country, size = 1)) + scale_shape_manual(values = c(8, 11, 15, 16, 17, 18)) + labs(title = "                                                                       MDS Plot with MHCII SNPs for All Countries")
+dev.off()
+```
+
+
+```{r}
+# here, MDS plots for each country is created by changing some parameters and names. Cartesian plot is arranged accordin to the already created MDS plots.
+pdf("./new_MDS_PCA/mhc2_MDS_s_africa.pdf", width = 15, height = 10)
+ggplot(mds_mhc2[mds_mhc2$Country == "S_Africa",], aes(C1, C2)) + geom_point(aes(color = FID, shape = FID, size = 1)) + scale_shape_manual(values = c(11,15,16,17, 18)) + coord_cartesian(xlim = c(-0.08, 0.107), ylim = c(-0.103, 0.103)) + labs(title = "                                                                       MDS Plot with MHCII SNPs for S_Africa")
+dev.off()
+```
+
+```{r}
+# MDS plots including all the HF is created.
+holstein_mds2 <- mds_mhc2[mds_mhc2$FID == "Finn_Holstein_Friesian",]
+holstein_mds2 <- rbind(holstein_mds2, mds_mhc2[mds_mhc2$FID == "NL_Holstein_Friesian",])
+holstein_mds2 <- rbind(holstein_mds2, mds_mhc2[mds_mhc2$FID == "EG_Holstein_Friesian",])
+holstein_mds2 <- rbind(holstein_mds2, mds_mhc2[mds_mhc2$FID == "UG_Holstein_Friesian",])
+holstein_mds2 <- rbind(holstein_mds2, mds_mhc2[mds_mhc2$FID == "SA_Holstein_Friesian",])
+
+pdf("./new_MDS_PCA/mhc2_MDS_holstein.pdf", width = 15, height = 10)
+ggplot(holstein_mds2, aes(C1, C2)) + geom_point(aes(color = FID, shape = FID, size = 1)) + scale_shape_manual(values = c(11,15,16,17, 18)) + coord_cartesian(xlim = c(-0.08, 0.107), ylim = c(-0.103, 0.103)) + labs(title = "                                                                       MDS Plot with MHCII SNPs for HF Cattle")
+dev.off()
+```
+## PCA
+
+
+```{r}
+# PCA plot is read from eigenvec file into a dataframe
+pca_mhc2 <- read.table("pca_AF_EU_MHCII_ref_ge_mi.eigenvec", header = TRUE)
+```
+
+
+```{r}
+pca_mhc2[pca_mhc2$FID == "Holstein-Fresian","FID"] <- "EG_Holstein_Friesian"
+pca_mhc2[pca_mhc2$FID == "Holstein-Friesian","FID"] <- "NL_Holstein_Friesian"
+pca_mhc2[pca_mhc2$FID == "Holstein","FID"] <- "SA_Holstein_Friesian"
+pca_mhc2[pca_mhc2$FID == "Friesian","FID"] <- "UG_Holstein_Friesian"
+```
+
+```{r}
+pca_mhc2$Country <- "some"
+pca_mhc2[pca_mhc2$FID == "Egyptian","Country"] <- "Egypt"
+pca_mhc2[pca_mhc2$FID == "EG_Holstein_Friesian","Country"] <- "Egypt"
+pca_mhc2[pca_mhc2$FID == "Eastern_Finn_cattle","Country"] <- "Finland"
+pca_mhc2[pca_mhc2$FID == "Western_Finn_cattle","Country"] <- "Finland"
+pca_mhc2[pca_mhc2$FID == "Northern_Finn_cattle","Country"] <- "Finland"
+pca_mhc2[pca_mhc2$FID == "Finn_Holstein_Friesian","Country"] <- "Finland"
+pca_mhc2[pca_mhc2$FID == "Dutch_belted","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "Fries_Hollands","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "Groninger_Whiteheaded","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "Deep_red","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "MRY","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "NL_Holstein_Friesian","Country"] <- "Netherlands"
+pca_mhc2[pca_mhc2$FID == "BAR","Country"] <- "Portugal"
+pca_mhc2[pca_mhc2$FID == "MER","Country"] <- "Portugal"
+pca_mhc2[pca_mhc2$FID == "MIR","Country"] <- "Portugal"
+pca_mhc2[pca_mhc2$FID == "Afrikaner","Country"] <- "S_Africa"
+pca_mhc2[pca_mhc2$FID == "Bonsmara","Country"] <- "S_Africa"
+pca_mhc2[pca_mhc2$FID == "Nguni","Country"] <- "S_Africa"
+pca_mhc2[pca_mhc2$FID == "Tuli","Country"] <- "S_Africa"
+pca_mhc2[pca_mhc2$FID == "SA_Holstein_Friesian","Country"] <- "S_Africa"
+pca_mhc2[pca_mhc2$FID == "Ankole","Country"] <- "Uganda"
+pca_mhc2[pca_mhc2$FID == "Karamojong","Country"] <- "Uganda"
+pca_mhc2[pca_mhc2$FID == "Nganda","Country"] <- "Uganda"
+pca_mhc2[pca_mhc2$FID == "Nkedi","Country"] <- "Uganda"
+pca_mhc2[pca_mhc2$FID == "Ntuku","Country"] <- "Uganda"
+pca_mhc2[pca_mhc2$FID == "UG_Holstein_Friesian","Country"] <- "Uganda"
+```
+
+
+
+```{r}
+# PCA plot including all the breeds is created.
+pdf("./new_MDS_PCA/mhc2_PCA_all_breed.pdf", width = 15, height = 10)
+ggplot(pca_mhc2, aes(PC1, PC2)) + geom_point(aes(color = FID, shape = Country, size = 1)) + scale_shape_manual(values = c(8, 11, 15, 16, 17, 18)) +scale_color_manual(values = c26) + labs(title = "                                                                       PCA Plot with MHCII SNPs for All Breeds")
+dev.off()
+```
+
+
+```{r}
+# PCA plot with all cattle highlighting the countries is created.
+pdf("./new_MDS_PCA/mhc2_PCA_all_country.pdf", width = 15, height = 10)
+ggplot(pca_mhc2, aes(PC1, PC2)) + geom_point(aes(color = Country, shape = Country, size = 1)) + scale_shape_manual(values = c(8, 11, 15, 16, 17, 18)) + labs(title = "                                                                       PCA Plot with MHCII SNPs for All Countries")
+dev.off()
+```
+
+
+
